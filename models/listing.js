@@ -7,7 +7,7 @@ const listingSchema = new Schema({
         required: true,
     },
     description:String,
-    image:{
+    image:{ 
         type:String,
         set: (v)=>
             v===""
