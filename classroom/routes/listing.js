@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const wrapAsync = require("../utils/wrapAsync.js");
-const {listingSchema } = require("../schema.js")
+const wrapAsync = require("../../utils/wrapAsync.js")
+const {listingSchema } = require("..//../schema.js")
 const ExpressError = require("../utils/ExpressError.js");
 const Listing = require("./models/listing.js");
+
 
 
 const validateListing = (req, res ,next) => {
@@ -16,9 +17,8 @@ const validateListing = (req, res ,next) => {
       next();
     }
   };
-  
-
-//Index Route
+ 
+  //Index Route
 router.get("/", async (req, res) => {
     const allListings = await Listing.find({});
     res.render("listings/index.ejs", { allListings });
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
     res.render("listings/new.ejs");
   });
 
-  //Show Route
+//Show Route
 // router.get(
 //     "/listings/:id" , 
 //     wrapAsync(async (req, res) => {
@@ -48,6 +48,7 @@ router.post(
      
       const newListing = new Listing(req.body.listing);
         await newListing.save();
+        req.flash("success" , "New Listing Created");
         res.redirect("/listings");
       })
   );
@@ -63,6 +64,7 @@ wrapAsync(async (req, res) => {
   }
   let { id } = req.params;
   await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  req.flash("success", "Listing Updated");
   res.redirect(`/listings/${id}`);
 }));
 
@@ -72,10 +74,10 @@ router.delete("/:id",
   let{id}  = req.params;
   let deleteListing = await Listing.findByIdAndDelete(id);
   console.log(deleteListing);
+  req.flash("success" , "Listing Deleted!");
   res.redirect("/listings");
 })
 );
-
 
 // Show Route GPT Ka Code
 // Show Route
@@ -90,6 +92,7 @@ router.get("/:id", async (req, res, next) => {
   
       const listing = await Listing.findById(id);
       if (!listing) {
+        req.flash("error", "Listing you requested for does not exists");
         throw new ExpressError(404, "Listing not found");
       }
       res.render("listings/show.ejs", { listing });
@@ -97,7 +100,7 @@ router.get("/:id", async (req, res, next) => {
       next(err); // Pass errors to the error handling middleware
     }
   });
-  
+
   //Edit Route
 //   app.get(
 //     "/listings/:id/edit",
